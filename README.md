@@ -202,7 +202,7 @@ Run `python eqbench3.py --help` for the full usage.
 
 ## 5. Merging Local Results into the Canonical Leaderboard
 
-Once you’re satisfied with your local run and want to merge your new model’s data into the official scoreboard (or any scoreboard):
+Once you’re satisfied with your local run and want to merge your new model’s data into a canonical leaderboard:
 1. **Review** your local results in `eqbench3_runs.json` and `elo_results_eqbench3.json`.
 2. **Use** `merge_results_to_canonical.py` to push selected runs from local to canonical files:
    ```bash

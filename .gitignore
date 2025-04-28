@@ -1,0 +1,6 @@
+.env
+backup
+*.json.tmp
+*.log
+__pycache__/
+*.pyc

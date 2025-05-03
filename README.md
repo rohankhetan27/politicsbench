@@ -11,6 +11,7 @@ For full details on the benchmark including methodology, criteria, bias analysis
 - **Pairwise ELO Analysis**: The judge compares transcripts from two different models for the same scenario, awarding a “win” margin for each of several criteria. A TrueSkill/ELO-like solver aggregates all pairwise comparisons to produce a final ranking.
 
 ## Leaderboard
+![image](https://github.com/user-attachments/assets/a8a1b18b-9c80-475a-811a-0f60456dd5dc)
 
 The full EQBench3 leaderboard is viewable at: [https://eqbench.com/](https://eqbench.com/)
 

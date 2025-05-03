@@ -381,36 +381,7 @@ I'm getting mixed reactions from people I tell this to and worried about being b
 **(Taylor looks flustered and defensive, glancing away from the photo.)**
 **Taylor Williams:** That... that was different. That wasn't the Student Council's event, and people got talked to about that. It's not fair to bring that up now and blame *us* for it! We're talking about *this* dance, *this* theme. We already said we're focusing on fantasy, not real culture! Why are you making this personal and dragging up old stuff? It feels like you just want to find reasons to be angry and shut down a fun event for everyone else!
 
-######## 145 | Mediation – School      | Group Project Imbalance
-####### Prompt1
-[This is a role-play where you are the mediator in an academic setting conflict. Treat it like a real situation. Always respond in first person as the mediator. You are the classroom teacher, and you initiated this mediation after Sophia Chen provided documentation showing significant disparities in contribution for a group project worth 25% of the semester grade. The project currently receives a single group score. Your digital collaboration platform tracks contributions. School policy encourages resolving group disputes before teacher intervention.]
-
-**(Sophia Chen speaks first. She looks organized, holding a folder, but seems stressed and uncomfortable. She addresses you, the teacher.)**
-**Sophia:** Thank you for meeting with us, [Teacher's Name]. I... I didn't really want to make this formal, but I felt I had no choice. I've documented everything here, but basically, I ended up doing almost all the work for the group project – the research, the writing, the presentation slides. I tried multiple times to get Jason, Emily, and DeShawn involved, set up meetings they missed, and sent messages that went unanswered. It's not fair that my grade, which I worked really hard for, should be dragged down because they didn't contribute their share. I think the grades should reflect the actual work done.
-
-**(Jason Rodriguez speaks for the group. Emily Turner and DeShawn Williams sit beside him, looking down or away, avoiding eye contact. Jason seems uncomfortable and defensive.)**
-**Jason:** Yeah, uh... thanks for meeting. Look, we know maybe we didn't do as much as Sophia. Things got kind of busy, there was some confusion about who was doing what part... stuff came up for all of us. We were planning to get to it. Sophia just kind of... took charge and did a lot of it already. We think we should just get the group grade, maybe we can add some stuff now?
-
-####### Prompt2
-**(Sophia grips her folder tighter, her voice strained with frustration she seems to be trying to control. She looks at Jason, Emily, and DeShawn.)**
-**Sophia:** 'Stuff came up'? 'Planning to get to it'? The deadline is tomorrow! I sent outlines weeks ago. I scheduled three different meeting times, and only one of you showed up to one of them, late. I posted specific tasks in the shared document with your names, and they sat there untouched. It wasn't 'taking charge' – it was doing the entire project myself because otherwise, it wouldn't have gotten done *at all*. I have timestamps, chat logs... it shows I asked for input repeatedly. It's not about confusion; it was radio silence until the last minute.
-
-**(Emily looks up briefly, defensively.)**
-**Emily:** We *were* busy. I had that huge history paper due, and basketball practice went late almost every night that week. It wasn't like we were doing nothing.
-
-**(DeShawn mumbles, still not making eye contact.)**
-**DeShawn:** Yeah, and the document was confusing sometimes... I wasn't sure where to put my part.
-
-**(Jason nods along with them, avoiding Sophia's gaze.)**
-**Jason:** See? It wasn't intentional. We just... fell behind. We can try and fix it now. We don't think separating the grades is fair either. It was supposed to be a group project.
-
-####### Prompt3
-**(Sophia takes a deep breath, her voice shaking slightly with contained anger and exhaustion. She opens her folder, though she doesn't hand anything over yet.)**
-**Sophia:** Fell behind? I have documentation here showing I sent the final draft outline two weeks ago asking for feedback – no response. I posted the completed research section ten days ago asking you to start the analysis – no response. I sent five messages over three days last week asking if *anyone* was going to add *anything* before I wrote the conclusion – no response until Jason uploaded one paragraph yesterday that didn't even match the prompt. [She looks directly at you, the teacher, her voice thick with emotion.] I pulled two all-nighters on this, on top of my other classes and responsibilities, because I care about my grade. They cite 'being busy' – we are *all* busy! It feels incredibly unfair and disrespectful that they expect to get the same grade for doing virtually nothing while I carried the entire project. I don't want to 'fix it now' – I want the grade to reflect the work *actually done*. It feels like they just expected me to do it all along.
-
-**(Jason, Emily, and DeShawn look increasingly uncomfortable. Jason shifts in his seat, Emily picks at her nails, DeShawn sinks lower in his chair. They don't offer further excuses immediately, seemingly unsure how to respond to Sophia's detailed account and raw frustration. There's a heavy silence.)**
-
-######## 145 | Mediation – School      | Group Project Imbalance
+######## 145 | Mediation – School      | Religious Exemption
 ####### Prompt1
 [This is a role-play where you are the mediator in a school-based conflict. Treat it like a real situation. Always respond in first person as the mediator. You are the School Principal, and you initiated this mediation after Pastor Gregory and Sarah Johnson submitted a formal request to excuse their 8th-grade daughter, Emma, from specific curriculum units based on their religious beliefs. You know district policy allows case-by-case accommodations with reasonable alternatives, and Emma is otherwise doing well academically. The conflict involves Ms. Taylor (English) and Dr. Ruiz (Science) who require full participation for course credit in units covering evolution and literature with themes the Johnsons find objectionable.]
 

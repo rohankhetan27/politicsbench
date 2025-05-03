@@ -30,13 +30,17 @@ SAMPLING_SCHEDULE: List[Tuple[Tuple[Optional[int], ...], int]] = [
     #   immediate neighbours: n = 8
     #   ±2 neighbours:        n/2 = 4
     #   ±3 neighbours:        n/4 = 2
-    ((1, 2, 3), 8),
+    #((1, 2, 3), 4),
+    #((1, 2, 3), 8),
+    #((1, 2, 3), 16),
+    #((1, 2, 3), 24),
 
     # stage‑3  – comprehensive zoom
     #   immediate neighbours: m = 40   (all 40 test items requested)
     #   ±2 neighbours:        m/2 = 20
     #   ±3 neighbours:        m/4 = 10
-    ((1, 2, 3), 45),
+    #((1, 2, 3), 45),
+    ((1, 2, 3), 9999), # for comprehensive round, we run matchups to full depth (all iterations)
 ]
 MAX_STAGE_LOOPS   = 4          # safety guard per stage
 #CONVERGENCE_EPS   = 5.0        # Elo pts required for stability

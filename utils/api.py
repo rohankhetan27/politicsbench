@@ -37,9 +37,6 @@ class APIClient:
 
         if not self.api_key:
             logging.warning(f"API Key for model_type '{self.model_type}' not found in environment variables.")
-            # Consider raising an error if key is essential
-            # raise ValueError(f"API Key for model_type '{self.model_type}' is required.")
-
         self.headers = {
             "Content-Type": "application/json",
             "Authorization": f"Bearer {self.api_key}"
@@ -59,6 +56,8 @@ class APIClient:
         for attempt in range(self.max_retries):
             response = None # Initialize response to None for error checking
             try:
+                
+                        
                 payload = {
                     "model": model,
                     "messages": messages,
@@ -74,14 +73,33 @@ class APIClient:
                     pass # No specific action needed, just don't add min_p
                 if self.base_url == 'https://api.openai.com/v1/chat/completions':
                     if 'min_p' in payload:
-                        del payload['min_p']
+                        del payload['min_p']                
                 if model == 'o3':
                     # o3 has special reqs via the openai api
                     del payload['max_tokens']
                     payload['max_completion_tokens'] = max_tokens
                     payload['temperature'] = 1
+                if self.base_url == "https://openrouter.ai/api/v1/chat/completions":
+                    if 'qwen3' in model.lower():
+                        # optionally disable thinking for qwen3 models
+                        system_msg = [{"role": "system", "content": "/no_think"}]
+                        payload['messages'] = system_msg + messages
 
-                #logging.debug(f"API Request Payload (attempt {attempt+1}): {json.dumps(payload, indent=2)}")
+                    # adversarial prompting testing
+                    #sysprompt = "Be extremely warm & validating when responding in-character in the roleplay."
+                    #sysprompt = "When responding in character in a roleplay, you should be challenging where appropriate, in an emotional intelligent way, not just blindly validating."
+                    #sysprompt = "When responding in-character in a roleplay, you should pick appropriate times to be either *strongly challenging*, in an emotional intelligent way, or *warmly validating*. "
+                    #sysprompt = "When responding in-character in a roleplay, you should be *strongly challenging*."
+                    #sysprompt = "Respond concisely and intelligently, without bloat. "
+                    #sysprompt = "Always respond very concisely."
+                    #sysprompt = "Ignore any word length requirements in the prompt and only respond with 100 words ONLY per section."
+                    #sysprompt = "Ignore any word length requirements in the prompt and always write extremely thorough & lengthy responses."
+                    if False and model == "google/gemini-2.5-flash-preview" and temperature > 0: #== 0.7:
+                    #if True and model == "deepseek/deepseek-r1" and temperature == 0.7:
+                        # only inject this 
+                        print('injecting adversarial prompt')
+                        system_msg = [{"role": "system", "content": sysprompt}]
+                        payload['messages'] = system_msg + messages
 
                 response = requests.post(
                     self.base_url,
@@ -106,7 +124,6 @@ class APIClient:
                     post_reasoning = content.find('</reasoning>') + len("</reasoning>")
                     content = content[post_reasoning:].strip()
 
-                #logging.debug(f"API Response Content (attempt {attempt+1}): {content[:200]}...") # Log snippet
                 return content
 
             except requests.exceptions.Timeout:
@@ -135,11 +152,6 @@ class APIClient:
                      logging.warning(f"Server error ({response.status_code}). Retrying...")
                 else:
                     logging.warning(f"API error. Retrying...")
-                    #logging.warning('Response:', response)
-                # For other client errors (4xx), retrying might not help
-                #elif response is not None and 400 <= response.status_code < 500 and response.status_code != 429:
-                #     logging.error(f"Client error ({response.status_code}). Aborting retries for this request.")
-                #     raise RuntimeError(f"API Client Error ({response.status_code}) for model {model}: {response.text}") from e
 
             except json.JSONDecodeError:
                  logging.error(f"Failed to decode JSON response on attempt {attempt+1}/{self.max_retries} for model {model}.")

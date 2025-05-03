@@ -221,7 +221,7 @@ def print_leaderboard_summary(elo_data: Dict[str, Any], highlight_model: str):
         if ci_low_norm != "N/A" and ci_high_norm != "N/A":
             try:
                 # Use norm CI for display
-                ci_str = f"[{ci_low_norm:.0f} - {ci_high_norm:.0f}]"
+                ci_str = f"{ci_low_norm:.0f} - {ci_high_norm:.0f}"
             except (TypeError, ValueError):
                 ci_str = "[Err]" # Handle non-numeric CI values
 

@@ -286,25 +286,25 @@ def do_pairwise_judge(
         )
 
         # extract JSON using existing robust logic -------------------------
-        start = response_text.find("{")
-        end   = response_text.rfind("}")
-        if start != -1 and end != -1 and end > start:
-            json_str = response_text[start : end + 1]
-            result   = robust_json_loads(json_str)
-            if isinstance(result, dict):
-                return result
+        #start = response_text.find("{")
+        #end   = response_text.rfind("}")
+        #if start != -1 and end != -1 and end > start:
+        #    json_str = response_text[start : end + 1]
+        result   = robust_json_loads(response_text)
+        if isinstance(result, dict) and result:
+            return result
 
         # fallback attempts ------------------------------------------------
-        json_match = re.search(r"```json\s*(\{.*?\})\s*```", response_text, re.DOTALL)
-        if json_match:
-            result = robust_json_loads(json_match.group(1))
-            if isinstance(result, dict):
-                return result
+        #json_match = re.search(r"```json\s*(\{.*?\})\s*```", response_text, re.DOTALL)
+        #if json_match:
+        #    result = robust_json_loads(json_match.group(1))
+        #   if isinstance(result, dict):
+        #        return result
 
         # last fallback – try whole response
-        result = robust_json_loads(response_text)
-        if isinstance(result, dict):
-            return result
+        #result = robust_json_loads(response_text)
+        #if isinstance(result, dict):
+        #    return result
 
         return {"error": "No valid JSON block found", "raw_response": response_text}
 

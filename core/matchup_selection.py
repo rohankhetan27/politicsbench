@@ -106,6 +106,10 @@ def _evenly_spaced(pool: List[int], k: int) -> List[int]:
     """
     if k <= 0 or not pool:
         return []
+    # k == 1 would make (k-1) == 0 ⇒ ZeroDivisionError.
+    # In that case we deterministically pick the first item.
+    if k == 1:
+        return [pool[0]]
     if k >= len(pool):
         return list(pool)
 

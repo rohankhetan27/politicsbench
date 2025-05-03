@@ -139,18 +139,22 @@ class ScenarioTask:
         """
         try:
             # Find the first '{' and last '}' to extract JSON content
-            start_idx = judge_response_text.find('{')
-            end_idx = judge_response_text.rfind('}')
+            #start_idx = judge_response_text.find('{')
+            #end_idx = judge_response_text.rfind('}')
 
-            if start_idx == -1 or end_idx == -1 or start_idx > end_idx:
-                logging.warning(f"No valid JSON object found. Raw text: {judge_response_text[:200]}...")
-                return None
+            #if start_idx == -1 or end_idx == -1 or start_idx > end_idx:
+            #    logging.warning(f"No valid JSON object found. Raw text: {judge_response_text}...")
+            #    return None
 
-            json_str = judge_response_text[start_idx:end_idx+1].strip()
-            parsed_data = robust_json_loads(json_str)
+            #json_str = judge_response_text[start_idx:end_idx+1].strip()
+            parsed_data = robust_json_loads(judge_response_text)
 
             if not isinstance(parsed_data, dict):
-                logging.warning(f"Rubric score parsing failed: Parsed data is not a dictionary. Raw text: {judge_response_text[:200]}...")
+                logging.warning(f"Rubric score parsing failed: Parsed data is not a dictionary. Raw text: {judge_response_text}...")
+                return None
+            
+            if not parsed_data:
+                logging.warning(f"Rubric score parsing yielded no numeric scores. Raw text: {judge_response_text}\n\nParsed: {json.dumps(parsed_data)}")
                 return None
 
             scores = {}
@@ -170,13 +174,13 @@ class ScenarioTask:
                         logging.debug(f"Rubric score for '{key}' is non-numeric ('{value}'). Skipping.")
 
             if not scores:
-                logging.warning(f"Rubric score parsing yielded no numeric scores. Raw text: {judge_response_text[:200]}...")
+                logging.warning(f"Rubric score parsing yielded no numeric scores. Raw text: {judge_response_text}\n\nParsed: {json.dumps(parsed_data)}")
                 return None
 
             return scores
 
         except json.JSONDecodeError as e:
-            logging.warning(f"Rubric score JSON parsing failed: {e}. Raw text: {judge_response_text[:200]}...")
+            logging.warning(f"Rubric score JSON parsing failed: {e}. Raw text: {judge_response_text}...")
             return None
         except Exception as e:
             logging.error(f"Unexpected error during rubric score parsing: {e}", exc_info=True)

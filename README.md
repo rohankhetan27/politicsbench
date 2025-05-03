@@ -1,12 +1,18 @@
 # EQ-Bench 3
 
-EQ-Bench 3 is a multi-turn emotional intelligence benchmark. It assesses active EQ skills, interpersonal skills, psychological insight and analytical depth. It challenges language models with role-play or analysis tasks that require empathy, depth of insight, social dexterity, and more. An auxiliary judge model (by default, Claude Sonnet 3.7) scores or pairwise-compares the outputs.  
+EQ-Bench 3 is a multi-turn emotional intelligence benchmark. It assesses active EQ skills, interpersonal skills, psychological insight and analytical depth. It challenges language models with role-play or analysis tasks that require empathy, depth of insight, social dexterity, and more. An auxiliary judge model (by default, Claude Sonnet 3.7) scores or pairwise-compares the outputs.
+
+For full details on the benchmark including methodology, criteria, bias analysis, repeatabilty experiments and more, click [here](http://localhost:8000/about.html#long-version-header).
 
 **Features**  
 - **Role-Play Scenarios**: The tested model is placed in conversation-based scenarios (e.g., parenting, relationship conflict, workplace tension). It must articulate what it (and others) feel/think before delivering its final response.  
 - **Analysis Scenarios**: The model is asked to read or interpret a transcript and perform an in-depth analysis of human dynamics and subtext.  
 - **Rubric Scoring**: A judge LLM assigns a multi-criteria rubric score (0–20, scaled up to 0–100) to each scenario outcome, focusing on empathy, emotional reasoning, social skill, etc.  
 - **Pairwise ELO Analysis**: The judge compares transcripts from two different models for the same scenario, awarding a “win” margin for each of several criteria. A TrueSkill/ELO-like solver aggregates all pairwise comparisons to produce a final ranking.
+
+## Leaderboard
+
+The full EQBench3 leaderboard is viewable at: [https://eqbench.com/](https://eqbench.com/)
 
 ## Table of Contents
 1. [Project Overview](#project-overview)  

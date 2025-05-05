@@ -23,7 +23,8 @@ from .elo_config import (
 from .elo_helpers import (
     format_conversation_history,
     should_ignore_scenario,
-    _data_has_all_expected_responses
+    _data_has_all_expected_responses,
+    downscale_analysis_pair
 )
 from .matchup_selection import (
     create_matchup_signature
@@ -57,7 +58,6 @@ def interpret_pairwise_result(result_dict):
         }
 
     for key, val in result_dict.items():
-        # Optionally skip certain keys that never count
         if key == 'chain_of_thought_reasoning':
             continue
 
@@ -69,6 +69,10 @@ def interpret_pairwise_result(result_dict):
             # Weight correctness strongly as it's high signal to differentiate stronger/weaker models
             # (this criteria is only relevant in analysis tasks)
             #if key in ["correctness"]: weight = 4
+            #if key in ["depth_of_insight", "authentic_eu", "causal_attribution", "theory_of_mind", "incisiveness", "reading_between_lines", "correctness", "overall_eq"]: weight = 0
+            #if key in ["authentic_eu", "causal_attribution", "theory_of_mind", "incisiveness", "reading_between_lines", "correctness"]: weight = 0.1
+            #if key not in ["demonstrated_empathy"]: weight = 0
+
             weighted_plus = plus_count * weight
 
             if "A0493" in val:
@@ -99,7 +103,7 @@ def custom_blend(x: float, linear_gradient=5, sigmoid_power=0.75, transition_sta
     Transforms a value in [0,1] by blending a linear slope with a sigmoid curve
     around [transition_start..transition_end].
     """
-    #return x
+    return x
     x = max(0.0, min(1.0, x))
     # Linear portion
     linear = linear_gradient * x
@@ -567,7 +571,16 @@ def _judge_scenario_pairs_in_parallel(
                     if direction == "forward":
                         # model_A is test_model_name, model_B is neighbor_model_name
                         outcome_for_test_model, test_model_plus_count, neighbor_plus_count = interpret_pairwise_result(judge_result)
-                        fracTest, diff, diff_norm, diff_blend = compute_fraction_for_test(outcome_for_test_model, test_model_plus_count, neighbor_plus_count)
+                        #fracTest, diff, diff_norm, diff_blend = compute_fraction_for_test(outcome_for_test_model, test_model_plus_count, neighbor_plus_count)
+                        (test_model_plus_count,
+                        neighbor_plus_count,
+                        diff,
+                        diff_norm,
+                        diff_blend,
+                        fracTest) = downscale_analysis_pair(
+                                        scenario_id, outcome_for_test_model,
+                                        test_model_plus_count, neighbor_plus_count)
+
                         comparison_result = {
                             "scenario_id": scenario_id,
                             "pair": {
@@ -597,7 +610,16 @@ def _judge_scenario_pairs_in_parallel(
                             outcome_for_test_model = 1.0
                         else:
                             outcome_for_test_model = 0.5
-                        fracTest, diff, diff_norm, diff_blend = compute_fraction_for_test(outcome_for_test_model, test_model_plus_count, neighbor_plus_count)
+                        #fracTest, diff, diff_norm, diff_blend = compute_fraction_for_test(outcome_for_test_model, test_model_plus_count, neighbor_plus_count)                        
+                        (test_model_plus_count,
+                        neighbor_plus_count,
+                        diff,
+                        diff_norm,
+                        diff_blend,
+                        fracTest) = downscale_analysis_pair(
+                                        scenario_id, outcome_for_test_model,
+                                        test_model_plus_count, neighbor_plus_count)
+                        
                         comparison_result = {
                             "scenario_id": scenario_id,
                             "pair": {
@@ -743,6 +765,15 @@ def _recompute_comparison_stats(comp: Dict[str, Any]) -> None:
     frac, diff, diff_norm, diff_blend = compute_fraction_for_test(
         outcome_test, plus_test, plus_other
     )
+
+    (plus_test,
+     plus_other,
+     diff,
+     diff_norm,
+     diff_blend,
+     frac) = downscale_analysis_pair(
+                 comp["scenario_id"], outcome_test,
+                 plus_test, plus_other)
 
     # overwrite the stored fields
     comp.update({

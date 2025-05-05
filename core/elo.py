@@ -26,6 +26,9 @@ from .elo_config import (
     DEFAULT_ELO,
     SAMPLING_SCHEDULE,
     MAX_STAGE_LOOPS,
+    WIN_MARGIN_BIN_SIZE,
+    WIN_MARGIN_BIN_SIZE_FOR_CI,
+    RANK_WINDOW,
     scenario_notes, # Import the global variable
     analysis_scenario_notes # Import the global variable
 )
@@ -287,8 +290,8 @@ def run_elo_analysis_eqbench3(
             valid_comps,
             full_start_ratings, # Pass initial Mu values
             debug=False,
-            use_fixed_initial_ratings=False, # Use current estimates as starting point
-            bin_size=20, # Default bin size
+            use_fixed_initial_ratings=True, # Use current estimates as starting point
+            bin_size=WIN_MARGIN_BIN_SIZE, # Default bin size
             return_sigma=True
         )
         return mu_map, sigma_map
@@ -425,7 +428,7 @@ def run_elo_analysis_eqbench3(
 
 
             # --- Re-solve ratings (using FULL merged comparison list) -------------
-            rank_window = 8 if stage_idx > 1 else None
+            rank_window = RANK_WINDOW if stage_idx > 1 else None
             comps_for_solver = get_solver_comparisons(
                 all_comparisons_global,
                 elo_snapshot if rank_window else None,
@@ -498,14 +501,19 @@ def run_elo_analysis_eqbench3(
 
 
     # ────────────────── FINAL SOLVE & NORMALIZE (using all comps) ───────────
-    logging.info("[ELO] Performing final rating calculation using all available comparisons...")
+    logging.info("[ELO] Performing final rating calculation")
     final_snapshot = {} # This will hold the results like {"model_name": {"elo": ..., "elo_norm": ...}}
     # Use the latest elo_snapshot from the sampling loop as a fallback if solve fails
     fallback_snapshot = elo_snapshot
 
     try:
         # Filter out ignored scenarios and errors for the final solve
-        final_comps_for_solver = get_solver_comparisons(all_comparisons_global)
+        # Filter out ignored scenarios/errors **and** apply the rank window
+        final_comps_for_solver = get_solver_comparisons(
+            all_comparisons_global,
+            elo_snapshot,          # current ladder snapshot built earlier
+            rank_window=rank_window
+        )
 
         if final_comps_for_solver:
             # Determine the set of all models involved in valid comparisons for the final solve
@@ -518,13 +526,28 @@ def run_elo_analysis_eqbench3(
 
             # Solve using the full comparison list to get final ratings
             # Use fixed initial ratings (DEFAULT_ELO) for this final solve for consistency
-            final_mu_map, final_sigma_map = solve_with_trueskill(
+            final_mu_map, _ = solve_with_trueskill(
                 list(models_to_solve_for), # Use the combined set of models
                 final_comps_for_solver,
                 {m: DEFAULT_ELO for m in models_to_solve_for}, # Start fresh from default
                 debug=False,
-                use_fixed_initial_ratings=True, # Use default ELO as start
-                bin_size=1, # Use bin_size=1 for CI calculation
+                use_fixed_initial_ratings=True,
+                bin_size=WIN_MARGIN_BIN_SIZE,
+                return_sigma=True
+            )
+
+            # solve again just for sigma (from which CI is calculated)
+            # using a smaller bin size so we are more fairly factoring in
+            # the increase in certainty afforded by the win margin
+            #  (note: this is just a guesstimate since we're already abusing
+            #   trueskill's sigma estimate by expanding win margin into extra wins)
+            _, final_sigma_map = solve_with_trueskill(
+                list(models_to_solve_for), # Use the combined set of models
+                final_comps_for_solver,
+                {m: DEFAULT_ELO for m in models_to_solve_for}, # Start fresh from default
+                debug=False,
+                use_fixed_initial_ratings=True,
+                bin_size=WIN_MARGIN_BIN_SIZE_FOR_CI, # Use bin_size=5 for CI calculation
                 return_sigma=True
             )
 

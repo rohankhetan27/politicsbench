@@ -1042,7 +1042,7 @@ def run_eq_bench3(
                 # Other params
                 scenarios_data=scenarios,
                 concurrency=num_threads,
-                recompute_existing=True # Or make this an arg?
+                recompute_existing=True
             )
 
             # Extract scores for the current model from the *solved* snapshot returned

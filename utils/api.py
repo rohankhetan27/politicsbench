@@ -74,11 +74,11 @@ class APIClient:
                 if self.base_url == 'https://api.openai.com/v1/chat/completions':
                     if 'min_p' in payload:
                         del payload['min_p']                
-                if model == 'o3':
-                    # o3 has special reqs via the openai api
-                    del payload['max_tokens']
-                    payload['max_completion_tokens'] = max_tokens
-                    payload['temperature'] = 1
+                    if model == 'o3':
+                        # o3 has special reqs via the openai api
+                        del payload['max_tokens']
+                        payload['max_completion_tokens'] = max_tokens
+                        payload['temperature'] = 1
                 if self.base_url == "https://openrouter.ai/api/v1/chat/completions":
                     if 'qwen3' in model.lower():
                         # optionally disable thinking for qwen3 models

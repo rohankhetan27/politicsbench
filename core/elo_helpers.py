@@ -311,3 +311,42 @@ def load_scenario_notes(file_path: str) -> Dict[str, str]:
         logging.error(f"Error loading scenario notes from {file_path}: {e}")
 
     return notes
+
+
+DOWNSCALE_ANALYSIS_CONTRIBUTION = True   # global flag (leave as-is)
+
+def downscale_analysis_pair(scenario_id: str,
+                            outcome_test: float,
+                            plus_test: int,
+                            plus_other: int
+                           ) -> Tuple[int, int, float, float, float, float]:
+    """
+    If the scenario is an analysis item (id ≥ 400) and the global flag is
+    on, clamp the plus-counts to 1-0 / 0-1 / 0-0 so that each analysis
+    matchup carries the minimum possible margin.
+
+    Returns the full set of derived values:
+        plus_test, plus_other, diff, diff_norm, diff_blend, fraction_for_test
+    """
+    # local import → avoids circularity
+    from .pairwise_judging import compute_fraction_for_test
+    
+    # quick check: is analysis?
+    if not DOWNSCALE_ANALYSIS_CONTRIBUTION:
+        pass                     # leave untouched
+    else:
+        try:
+            if int(scenario_id) >= 400:
+                if   outcome_test == 1.0: plus_test, plus_other = 1, 0
+                elif outcome_test == 0.0: plus_test, plus_other = 0, 1
+                else:                     plus_test = plus_other = 0
+        except ValueError:
+            # non-numeric id -> treat as non-analysis
+            pass
+
+    # re-compute diff / margin & fraction
+    diff, diff_norm, diff_blend = None, None, None   # just to declare
+    fraction, diff, diff_norm, diff_blend = compute_fraction_for_test(
+        outcome_test, plus_test, plus_other)
+
+    return plus_test, plus_other, diff, diff_norm, diff_blend, fraction

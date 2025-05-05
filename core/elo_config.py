@@ -14,6 +14,7 @@ DEFAULT_ELO = 1200.0
 MAX_POSSIBLE_DIFF = 30
 ALLOW_INCOMPLETE_RESPONSES = True
 MAX_ITEMS_PER_MODEL_MATCHUP = 99999 # Limit comparisons per pair (adjust if needed)
+RANK_WINDOW = 16 # Limits how many ranks +/- for which we include matchups for a given model in the final solve
 
 # Scenarios to ignore for ELO calculation (ADAPT AS NEEDED)
 IGNORE_SCENARIOS_FOR_ELO: Set[str] = {
@@ -30,10 +31,10 @@ SAMPLING_SCHEDULE: List[Tuple[Tuple[Optional[int], ...], int]] = [
     #   immediate neighbours: n = 8
     #   ±2 neighbours:        n/2 = 4
     #   ±3 neighbours:        n/4 = 2
-    #((1, 2, 3), 4),
-    #((1, 2, 3), 8),
-    #((1, 2, 3), 16),
-    #((1, 2, 3), 24),
+    ((1, 2, 3), 4),
+    ((1, 2, 3), 8),
+    ((1, 2, 3), 16),
+    ((1, 2, 3), 24),
 
     # stage‑3  – comprehensive zoom
     #   immediate neighbours: m = 40   (all 40 test items requested)
@@ -43,7 +44,6 @@ SAMPLING_SCHEDULE: List[Tuple[Tuple[Optional[int], ...], int]] = [
     ((1, 2, 3), 9999), # for comprehensive round, we run matchups to full depth (all iterations)
 ]
 MAX_STAGE_LOOPS   = 4          # safety guard per stage
-#CONVERGENCE_EPS   = 5.0        # Elo pts required for stability
 
 rng = random.Random(42)
 scenario_notes: Dict[str, str] = {}
@@ -53,3 +53,7 @@ analysis_scenario_notes: Dict[str, str] = {} # Separate notes for analysis tasks
 MANDATORY_SECTIONS_ROLEPLAY = {"thinking_feeling", "their_thinking_feeling", "response"}
 MANDATORY_SECTIONS_DRAFTING = {"perspective_taking", "draft_brainstorming", "draft"}
 _MIN_RAW_LEN = 100                     # chars after strip
+
+# Vars controlling how win margins are expanded to extra wins
+WIN_MARGIN_BIN_SIZE = 20
+WIN_MARGIN_BIN_SIZE_FOR_CI = 5 # reduce extra wins expansion when calculating confidence intervals

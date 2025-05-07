@@ -183,6 +183,7 @@ Run `python eqbench3.py --help` for the full usage.
      --judge-model mistralai/mistral-medium-3 \
      --runs-file "exp01_results.json" \
      --elo-results-file "exp01_elo_results.json" \
+     --threads 10 \
      --ignore-canonical
    ```
 
@@ -192,7 +193,47 @@ Run `python eqbench3.py --help` for the full usage.
      --judge-model mistralai/mistral-medium-3 \
      --runs-file "exp01_results.json" \
      --elo-results-file "exp01_elo_results.json" \
+     --threads 10 \
      --ignore-canonical
+   ```
+
+   **Example Output:**
+   ```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                        EQBench3 Rubric Score Summary                        │
+╞─────────────────────────────────────────────────────────────────────────────╡
+│ Rank │ Model Name                                         │ Rubric (0-100)  │
+├──────┼────────────────────────────────────────────────────┼─────────────────┤
+│  1   │ mistralai/mistral-medium-3                         │ 83.7            │
+│ >2   │ mistralai/mistral-large-2411                       │ 76.8            │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌───────────────────────────────────────────────────────────────────────────────────────────┐
+│                                EQBench3 Leaderboard Summary                               │
+╞───────────────────────────────────────────────────────────────────────────────────────────╡
+│ Rank │ Model Name                          │ ELO Norm │ ELO Raw  │ 95% CI Norm  │ Sigma   │
+├──────┼─────────────────────────────────────┼──────────┼──────────┼──────────────┼─────────┤
+│  1   │ mistralai/mistral-medium-3          │ 1273     │ 1273     │ 1237 - 1308  │ 18.1    │
+│ >2   │ mistralai/mistral-large-2411        │ 1127     │ 1127     │ 1092 - 1163  │ 18.1    │
+└───────────────────────────────────────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                       │               EQBench3 Results Summary               │
+╞──────────────────────────────────────────────────────────────────────────────╡
+│ Run Key:              │ 1_mistralai_mistral-large-2411                       │
+│ Model Name:           │ mistralai/mistral-large-2411                         │
+│ API Model ID:         │ mistralai/mistral-large-2411                         │
+│ Judge (Rubric/ELO):   │ mistralai/mistral-medium-3                           │
+│ Status:               │ completed                                            │
+├──────────────────────────────────────────────────────────────────────────────┤
+│ Duration:             │ 00:02:59                                             │
+├──────────────────────────────────────────────────────────────────────────────┤
+│                       │                 ELO Analysis Results                 │
+├──────────────────────────────────────────────────────────────────────────────┤
+│ Rubric Score (0‑100): │ 76.75                                                │
+│ ELO Raw:              │ 1127.25                                              │
+│ ELO (Normalised):     │ 1127.25                                              │
+└──────────────────────────────────────────────────────────────────────────────┘
    ```
 
   - With this usage, you can run pairwise matchups against just the models of interest, giving discriminative results even for small differences in performance.

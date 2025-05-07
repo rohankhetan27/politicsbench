@@ -1,3 +1,5 @@
+# File: ai/eqbench3/utils/file_io.py
+
 import os
 import json
 import logging
@@ -13,6 +15,8 @@ def get_file_lock(file_path: str) -> threading.RLock:
     """
     Acquire or create a per-file lock to avoid concurrent writes.
     """
+    # This function should now only be called with valid string paths.
+    # The check for None should happen in the calling function (load_json_file).
     with _file_locks_lock:
         # Normalize path for consistent locking, especially with .gz
         normalized_path = os.path.normpath(file_path)
@@ -24,7 +28,12 @@ def load_json_file(file_path: str) -> dict:
     """
     Thread-safe read of a JSON file (plain or gzipped), returning an empty dict
     if not found or error. Detects gzip based on '.gz' extension.
+    Handles file_path being None by returning an empty dict immediately.
     """
+    if file_path is None:
+        logging.debug("File path is None, returning empty dict.")
+        return {}
+
     lock = get_file_lock(file_path)
     with lock:
         if not os.path.exists(file_path):
@@ -122,6 +131,10 @@ def save_json_file(data: Dict[str, Any], file_path: str, max_retries: int = 3, r
     Thread-safe function to save dictionary data to a JSON file (plain or gzipped)
     using atomic write. Includes retry logic. Detects gzip based on '.gz' extension.
     """
+    if file_path is None: # Should not happen if called correctly, but good safeguard
+        logging.error("save_json_file called with None file_path. Cannot save.")
+        return False
+
     lock = get_file_lock(file_path)
     for attempt in range(max_retries):
         if attempt > 0:
@@ -154,6 +167,10 @@ def update_run_data(runs_file: str, run_key: str, update_dict: Dict[str, Any],
     (plain or gzipped). Handles nested merging for 'scenario_tasks'.
     Detects gzip based on '.gz' extension.
     """
+    if runs_file is None: # Should not happen if called correctly
+        logging.error(f"update_run_data called with None runs_file for run_key {run_key}. Cannot update.")
+        return False
+
     lock = get_file_lock(runs_file)
     for attempt in range(max_retries):
         if attempt > 0:

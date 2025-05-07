@@ -297,7 +297,7 @@ def print_leaderboard_summary(elo_data: Dict[str, Any], highlight_model: str):
 
     # --- Print Table ---
     print("\n" + TOP)
-    print(f"│{'EQBench3 Leaderboard Summary'.center(BOX_W - 2)}│") # Center title within the box
+    print(f"│{'EQBench3 Elo Results'.center(BOX_W - 2)}│") # Center title within the box
     print(TITLE_SEP)
     print(header_row)
     print(ROW_SEP) # Print the correctly calculated row separator directly

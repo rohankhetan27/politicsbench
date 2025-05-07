@@ -24,24 +24,25 @@ The full EQ-Bench leaderboard is viewable at: [https://eqbench.com/](https://eqb
    - [Example Commands](#example-commands)  
    - [Rubric vs ELO](#rubric-vs-elo)  
    - [Local vs Canonical Results Files](#local-vs-canonical-results-files)  
-5. [Merging Local Results into the Canonical Leaderboard](#merging-local-results-into-the-canonical-leaderboard)  
-6. [Folder and File Structure](#folder-and-file-structure)  
-7. [Limitations and Notes](#limitations-and-notes)  
-8. [Contact and License](#contact-and-license)  
-9. [Citation](#citation)
+5. [Example Use Case: Compare a single model to a baseline with Elo](#5-example-use-case-compare-a-single-model-to-a-baseline-with-elo)
+6. [Merging Local Results into the Canonical Leaderboard](#merging-local-results-into-the-canonical-leaderboard)  
+7. [Folder and File Structure](#folder-and-file-structure)  
+8. [Limitations and Notes](#limitations-and-notes)  
+9. [Contact and License](#contact-and-license)  
+10. [Citation](#citation)
 
 ---
 
 ## 1. Project Overview
 
-EQ-Bench 3 aims to measure “active emotional intelligence” abilities in LLMs. Rather than knowledge-based or short-answer questions, tasks here are multi-turn dialogues or analysis questions that test empathy, social dexterity, and psychological insight. The tested model’s responses are then evaluated by a judge model:
+EQ-Bench 3 aims to measure **active emotional intelligence** abilities in LLMs. Rather than knowledge-based or short-answer questions, tasks here are multi-turn dialogues or analysis questions that test empathy, social dexterity, and psychological insight. The evaluated model’s responses are then graded by a judge model:
 - **Rubric pass**: The judge model issues a numerical score for each scenario.  
 - **ELO pass**: The judge model performs pairwise comparisons of transcripts from different models, resulting in an overall ELO ranking (via TrueSkill).
 
 ### Key Points
 - **Scenarios** vary from relationship drama to conflict mediation, pushing the tested model to reason about others’ emotions.  
 - **Analysis tasks** require deeper reflection on a provided transcript or scenario.  
-- **Judge model**: By default, a Claude model (Sonnet 3.7) is used, but any LLM accessible via your environment (like GPT-4.1) could serve as judge.  
+- **Judge model**: By default, a Claude model (Sonnet 3.7) is used, but any LLM accessible via an OpenAI-compatible endpoint can serve as judge.  
 - **Truncation**: Pairwise judgments truncate outputs to level the playing field. Rubric judgments typically do not truncate (to preserve detail).  
 
 ---
@@ -84,45 +85,35 @@ EQ-Bench 3 aims to measure “active emotional intelligence” abilities in LLMs
 
 ## 3. Quickstart
 
-1. **Run a single iteration** of the entire EQ-Bench (both scenario simulation and scoring) for a model:
-   ```bash
-   python eqbench3.py \
-     --test-model openai/gpt-4.1-mini \
-     --judge-model anthropic/claude-3.7-sonnet \
-     --no-elo \
-     --no-rubric
-   ```
-   This will simply run each scenario but skip ELO and Rubric steps. The partial transcripts appear in `eqbench3_runs.json`.
-
-2. **Enable Rubric Scoring**:
+1. **Run a single iteration** of EQ-Bench (Rubric Scoring only, no Elo):
    ```bash
    python eqbench3.py \
      --test-model openai/gpt-4.1-mini \
      --model-name gpt-4.1-mini-demo-run \
      --judge-model anthropic/claude-3.7-sonnet \
      --no-elo \
-     --iterations 2
+     --iterations 1
    ```
-   - Runs 2 iterations of every scenario, scoring them with the rubric.  
-   - Data is recorded in `eqbench3_runs.json` with final average rubric in `.results.average_rubric_score`.
+   - Runs 1 iteration of every scenario, scoring them with the rubric.  
+   - Data is recorded in `eqbench3_runs.json`, and results displayed to console.
 
-3. **Enable Full ELO**:
+3. **Full benchmark run with Elo to place the model on the leaderboard**:
    ```bash
    python eqbench3.py \
      --test-model openai/gpt-4.1-mini \
      --model-name my-gpt4-run \
      --judge-model anthropic/claude-3.7-sonnet
    ```
-   - After scenario simulation, it does a multi-stage pairwise pass (comparing `my-gpt4-run` to known models in local+leaderboard data).  
-   - A final ELO rating is stored in `elo_results_eqbench3.json` (and will appear in `.results.elo_raw` in `eqbench3_runs.json`).
+   - After the roleplay scenarios are completed, it does a multi-stage pairwise pass (comparing the evaluated model to known models in local+leaderboard data).  
+   - Matchup results & ELO rating is stored in `elo_results_eqbench3.json`, and displayed to console.
 
 ---
 
 ## 4. Running the Benchmark
 
 You interact with the main script [`eqbench3.py`](./eqbench3.py). It orchestrates:
-- **Scenario simulation** (multi-turn, plus optional debrief).  
-- **Rubric scoring** (judge LLM reads final transcripts and issues a 0–100 scaled rating).  
+- **Roleplay scenarios** (multi-turn, plus self-debrief).  
+- **Rubric scoring** (judge LLM reads final transcripts and grades on several criteria).  
 - **ELO analysis** (judge LLM does pairwise comparisons, then solves rating with TrueSkill).  
 
 ### Command-Line Arguments
@@ -143,71 +134,73 @@ You interact with the main script [`eqbench3.py`](./eqbench3.py). It orchestrate
 | `--iterations`                     | Number of times to run each scenario. Default is 1.                                                                                     |
 | `--no-elo`                         | If set, skip the ELO analysis step.                                                                                                      |
 | `--no-rubric`                      | If set, skip the rubric scoring step.                                                                                                   |
+| `--ignore-canonical`               | If set, do not load or use default canonical leaderboard files. Runs will be based on local files only.                                  |
 | `--redo-rubric-judging`            | Reset tasks’ rubric status so that rubric scoring is done again.                                                                        |
 | `--reset-model`                    | Wipes all local data (runs & ELO comparisons) pertaining to `--model-name` before starting.                                             |
 
 Run `python eqbench3.py --help` for the full usage.
 
-### Example Commands
-
-1. **Rubric-Only**:  
-   ```bash
-   python eqbench3.py \
-     --test-model "openai/gpt-4.1" \
-     --judge-model "anthropic/claude-3.7-sonnet" \
-     --no-elo \
-     --iterations 3
-   ```
-   - Runs each scenario 3 times, finishing with a final rubric score in `eqbench3_runs.json`.
-
-2. **Full ELO**:  
-   ```bash
-   python eqbench3.py \
-     --test-model "anthropic/claude-3.7-sonnet" \
-     --model-name "claude-3.7-expt1" \
-     --judge-model "anthropic/claude-3.7-sonnet"
-   ```
-   - Compares `claude-3.7-expt1` to other data in `elo_results_eqbench3.json` + `data/canonical_leaderboard_elo_results.json.gz`, updating local ELO.
-
-3. **Force Overwrite** (If you want to re-run rubric scroing on a previously finished run):
-   ```bash
-   python eqbench3.py \
-     --test-model "openai/gpt-4.1-mini" \
-     --judge-model "anthropic/claude-3.7-sonnet" \
-     --redo-rubric-judging \
-     --no-elo
-   ```
-
 ### Rubric vs ELO
 - **Rubric**:  
-  - Each scenario is scored individually on a 0–20 scale (scaled to 0–100 in summary).  
-  - Less variance in cost; no direct competition among models.  
+  - Each scenario is scored by the judge on a set of criteria covering EQ abilities.  
+  - Cheaper to run (about $1.50 in judging costs per iteration). Less variance in cost than Elo; no direct competition among models.
   - Good if you want an absolute measure for a single model, or when you only have one model to test.
+  - Less discriminative compared to Elo, especially at the top ability range.
 
 - **ELO** (TrueSkill)  
-  - The judge compares transcripts from different models for each scenario, awarding a margin-based “win.”  
+  - The judge compares transcripts from different models for each scenario, awarding a margin-based “win.”
+  - Matchups are picked sparsely, efficiently narrowing in on the model's placement on the existing leaderboard.
   - Requires at least one baseline or previously completed model to compare against.  
-  - It can be more discriminative at the top, but also more expensive if you have many existing models.  
+  - Elo is more discriminative than the scoring rubric (by quite a lot), but also more expensive: around $10-20 in judging costs.
+  - Can use either the canonical leaderboard (uses same results data as [eqbench.com](https://eqbench.com/)), or a user-specified local leaderboard.
   - Typically requires final results to be saved in `elo_results_eqbench3.json` (local) or the canonical `data/canonical_leaderboard_elo_results.json.gz`.
 
 **You can run either or both**. If you do both, you end up with a final ELO rating as well as an average rubric score.
 
 ### Local vs Canonical Results Files
 - **Local Files**:  
-  - `eqbench3_runs.json`: Stores detailed transcripts, partial results, scenario statuses.  
-  - `elo_results_eqbench3.json`: Stores local pairwise comparisons plus your local ELO ratings for each model.  
-  - Safe to commit or ignore, depending on your usage.  
+  - `eqbench3_runs.json`: Stores detailed transcripts, partial results, scenario statuses. This is the default local run results file, and can be set by user.
+  - `elo_results_eqbench3.json`: Stores local pairwise comparisons plus your local ELO ratings for each model. This is the default local run results file, and can be set by user.
 - **Canonical Files**:  
   - `data/canonical_leaderboard_results.json.gz`  
   - `data/canonical_leaderboard_elo_results.json.gz`  
-  - These represent the official leaderboard data. If you run ELO with these files, your model is compared to previously included models from the central scoreboard.  
+  - These represent the official leaderboard data from models included on [eqbench.com](https://eqbench.com). By default, the canonical results are combined with your local results when running Elo. That means your evaluated model will be matched up against these leaderboard models, its placement on the leaderboard will be displayed at the end.
 
-**Why specify your own canonical results files?**  
-- If you don’t want to compare your model to the entire official scoreboard, you can point to a different `--leaderboard-runs-file` and `--leaderboard-elo-file`. This could be a partial or private scoreboard.
+**Running Elo on local results only**
+  - If you prefer not to run Elo against the leaderboard models, you can turn this off with `--ignore-canonical`, which means the evaluated model will only be matched against local results. Example flow:
+
+**Specify your own canonical leaderboard**  
+- You may wish to maintain your own local leaderboard, instead of using the canonical eqbench.com results.
+**e.g. you may want to compare a fine-tuned model to a baseline.**
+- you can point to a different `--leaderboard-runs-file` and `--leaderboard-elo-file`
+
+
+## 5. Example Use Case: Compare a single model to a baseline with Elo
+
+   ```bash
+   python eqbench3.py \
+     --test-model mymodel-baseline \
+     --judge-model mistralai/mistral-medium-3 \
+     --runs-file "exp01_results.json" \
+     --elo-results-file "exp01_elo_results.json" \
+     --ignore-canonical
+   ```
+
+   ```bash
+   python eqbench3.py \
+     --test-model mymodel-finetune \
+     --judge-model mistralai/mistral-medium-3 \
+     --runs-file "exp01_results.json" \
+     --elo-results-file "exp01_elo_results.json" \
+     --ignore-canonical
+   ```
+
+  - With this usage, you can run pairwise matchups against just the models of interest, giving discriminative results even for small differences in performance.
+
 
 ---
 
-## 5. Merging Local Results into the Canonical Leaderboard
+## 6. Merging Local Results into the Canonical Leaderboard
 
 Once you’re satisfied with your local run and want to merge your new model’s data into a canonical leaderboard:
 1. **Review** your local results in `eqbench3_runs.json` and `elo_results_eqbench3.json`.
@@ -226,20 +219,20 @@ Once you’re satisfied with your local run and want to merge your new model’s
 
 ---
 
-## 6. Folder and File Structure
+## 7. Folder and File Structure
 
 - **`eqbench3.py`**: Main entry point for generating scenario outcomes, running rubric scoring, and orchestrating ELO.  
 - **`merge_results_to_canonical.py`**: Script that merges local runs/ELO data with canonical results and re-runs an ELO solve.  
 - **`data/`**: Contains canonical leaderboard data (`.json.gz`), scenario prompts, and supporting prompt templates.  
 - **`utils/`**: Helper modules for file I/O, logging, API calls.  
-- **`core/`**: Contains the main logic for scenario simulation, ELO, TrueSkill solver, pairwise judgement, and other components.  
+- **`core/`**: Contains the main logic for running the roleplay scenarios, ELO, TrueSkill solver, pairwise judgement, and other components.  
 - **`eqbench3_runs.json`** (local default): Your local scenario transcripts & statuses.  
 - **`elo_results_eqbench3.json`** (local default): Your local ELO comparisons & ratings.  
 - **`.env`**: Environment file specifying API credentials & certain timeouts.
 
 ---
 
-## 7. Limitations and Notes
+## 8. Limitations and Notes
 
 1. **Subjectivity**. Scores rely on a single LLM judge, which may exhibit biases or partialities.  
 2. **Truncation**. Pairwise judgments deliberately truncate outputs to mitigate length bias.  
@@ -249,20 +242,20 @@ Once you’re satisfied with your local run and want to merge your new model’s
 
 ---
 
-## 8. Contact and License
+## 9. Contact and License
 
 - **License**: This project is open-sourced under an [MIT license](./LICENSE)
 - **Contact**: For questions, refer to the [Issues](https://github.com/EQ-bench/eqbench3/issues) section of this repository.  
 
 Contributions or suggestions are welcome—please open an issue or pull request.
 
-## 9. Citation
+## 10. Citation
 
 If you use EQ-Bench 3 in academic work, please cite both the benchmark
 repository and the original EQ-Bench paper.
 
+**Citing EQ-Bench 3 (this repository):**
 ```bibtex
-# Benchmark repository (update the version / commit as appropriate)
 @misc{eqbench3_repo_2025,
   author       = {Samuel J. Paech},
   title        = {EQ-Bench 3: Emotional Intelligence Benchmark},
@@ -270,7 +263,10 @@ repository and the original EQ-Bench paper.
   howpublished = {\url{https://github.com/EQ-bench/eqbench3}},
   note         = {Commit \<hash\> or release \<tag\>}
 }
+```
 
+**Citing the legacy EQ-Bench paper:**
+```bibtex
 @misc{paech2023eqbench,
   title        = {EQ-Bench: An Emotional Intelligence Benchmark for Large Language Models},
   author       = {Samuel J. Paech},
@@ -279,3 +275,4 @@ repository and the original EQ-Bench paper.
   archivePrefix= {arXiv},
   primaryClass = {cs.CL}
 }
+```

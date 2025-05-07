@@ -1,4 +1,3 @@
-
 # File: ai/eqbench3/eqbench3.py
 
 """
@@ -507,6 +506,12 @@ def main():
     parser.add_argument("--save-interval", type=int, default=2, help="How often (in tasks) to save partial progress to local files.")
     parser.add_argument("--iterations", type=int, default=1, help="Number of times to run each scenario (for assessing variance).")
     # --- Feature Flags ---
+    parser.add_argument(
+        "--ignore-canonical",
+        action="store_true",
+        default=False,
+        help="If set, do not load or use default canonical leaderboard files. Runs will be based on local files only."
+    )
     parser.add_argument("--no-elo", action="store_true", default=False, help="Disable the ELO analysis step.")
     parser.add_argument("--no-rubric", action="store_true", default=False, help="Disable the Rubric scoring step.")
     parser.add_argument("--redo-rubric-judging", action="store_true", default=False,
@@ -533,13 +538,27 @@ def main():
     # Setup logging first
     setup_logging(get_verbosity(args.verbosity))
 
+    actual_leaderboard_runs_file = args.leaderboard_runs_file
+    actual_leaderboard_elo_file = args.leaderboard_elo_file
+
+    if args.ignore_canonical:
+        logging.info("--ignore-canonical flag is set. Canonical leaderboard files will not be loaded or used.")
+        actual_leaderboard_runs_file = None # load_json_file will return {} for this
+        actual_leaderboard_elo_file = None  # load_json_file will return {} for this
+    else:
+        # Optional: Check existence and warn if not found, though load_json_file handles it
+        if not os.path.exists(args.leaderboard_runs_file):
+            logging.warning(f"Canonical leaderboard runs file not found: {args.leaderboard_runs_file}. Will proceed as if empty. Use --ignore-canonical to run purely locally and suppress this warning.")
+        if not os.path.exists(args.leaderboard_elo_file):
+            logging.warning(f"Canonical leaderboard ELO file not found: {args.leaderboard_elo_file}. Will proceed as if empty. Use --ignore-canonical to run purely locally and suppress this warning.")
+
     logging.info("--- EQBench3 Run Start ---")
     logging.info(f"Logical Model Name: {logical_model_name}")
     logging.info(f"API Model ID: {api_model_id}")
     logging.info(f"Local Runs File: {args.runs_file}")
     logging.info(f"Local ELO File: {args.elo_results_file}")
-    logging.info(f"Leaderboard Runs File: {args.leaderboard_runs_file}")
-    logging.info(f"Leaderboard ELO File: {args.leaderboard_elo_file}")
+    logging.info(f"Leaderboard Runs File (effective): {actual_leaderboard_runs_file if actual_leaderboard_runs_file else 'Ignored'}")
+    logging.info(f"Leaderboard ELO File (effective): {actual_leaderboard_elo_file if actual_leaderboard_elo_file else 'Ignored'}")
     logging.debug(f"Full Arguments: {args}")
 
     if args.reset_model:
@@ -568,8 +587,8 @@ def main():
             # File Paths
             local_runs_file=args.runs_file,
             local_elo_file=args.elo_results_file,
-            leaderboard_runs_file=args.leaderboard_runs_file,
-            leaderboard_elo_file=args.leaderboard_elo_file,
+            leaderboard_runs_file=actual_leaderboard_runs_file,
+            leaderboard_elo_file=actual_leaderboard_elo_file,
             # Run Control
             num_threads=args.threads,
             run_id=args.run_id,
@@ -607,8 +626,12 @@ def main():
         if run_rubric_flag and run_key:
             try:
                 logging.info("Loading merged run data for Rubric leaderboard display...")
-                # Load final data from both sources
-                final_leaderboard_runs = load_json_file(args.leaderboard_runs_file)
+                # Load final data from both sources, respecting --ignore-canonical
+                final_leaderboard_runs = {}
+                if not args.ignore_canonical:
+                    final_leaderboard_runs = load_json_file(actual_leaderboard_runs_file)
+                else:
+                    logging.info("Rubric summary: Not loading canonical runs due to --ignore-canonical.")
                 final_local_runs = load_json_file(args.runs_file)
                 final_merged_runs = {**final_leaderboard_runs, **final_local_runs}
 

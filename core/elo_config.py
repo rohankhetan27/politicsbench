@@ -34,13 +34,15 @@ SAMPLING_SCHEDULE: List[Tuple[Tuple[Optional[int], ...], int]] = [
     ((1, 2, 3), 4),
     ((1, 2, 3), 8),
     ((1, 2, 3), 16),
-    ((1, 2, 3), 24),
+    #((1, 2, 3), 24),
 
     # stage‑3  – comprehensive zoom
     #   immediate neighbours: m = 40   (all 40 test items requested)
     #   ±2 neighbours:        m/2 = 20
     #   ±3 neighbours:        m/4 = 10
-    #((1, 2, 3), 45),
+    # 45 items is max depth
+    #((1, 2, 3), 32), 
+    #((1, 2, 3), 45), 
     ((1, 2, 3), 9999), # for comprehensive round, we run matchups to full depth (all iterations)
 ]
 MAX_STAGE_LOOPS   = 4          # safety guard per stage
@@ -56,4 +58,4 @@ _MIN_RAW_LEN = 100                     # chars after strip
 
 # Vars controlling how win margins are expanded to extra wins
 WIN_MARGIN_BIN_SIZE = 20
-WIN_MARGIN_BIN_SIZE_FOR_CI = 5 # reduce extra wins expansion when calculating confidence intervals
+WIN_MARGIN_BIN_SIZE_FOR_CI = 3 # reduce extra wins expansion when calculating confidence intervals

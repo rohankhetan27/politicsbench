@@ -99,4 +99,6 @@ MODEL_NAME_SUBS = {
     'openai/gpt-4.1': 'gpt-4.1',
     'openai/gpt-4.1-nano': 'gpt-4.1-nano',
     'google/gemini-2.5-flash-preview': 'gemini-2.5-flash-preview',
+    'anthropic/claude-opus-4': 'claude-opus-4',
+    'mistralai/mistral-small-3.2-24b-instruct': 'mistralai/Mistral-Small-3.2-24B-Instruct-2506',
 }

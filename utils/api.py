@@ -79,6 +79,16 @@ class APIClient:
                         del payload['max_tokens']
                         payload['max_completion_tokens'] = max_tokens
                         payload['temperature'] = 1
+                    if model in ['gpt-5-2025-08-07', 'gpt-5-mini-2025-08-07', 'gpt-5-nano-2025-08-07']:
+                        payload['reasoning_effort']="minimal"
+                        del payload['max_tokens']
+                        payload['max_completion_tokens'] = max_tokens
+                        payload['temperature'] = 1
+
+                    if model in ['gpt-5-chat-latest']:
+                        del payload['max_tokens']
+                        payload['max_completion_tokens'] = max_tokens
+                        payload['temperature'] = 1
                 if self.base_url == "https://openrouter.ai/api/v1/chat/completions":
                     if 'qwen3' in model.lower():
                         # optionally disable thinking for qwen3 models
@@ -100,6 +110,16 @@ class APIClient:
                         print('injecting adversarial prompt')
                         system_msg = [{"role": "system", "content": sysprompt}]
                         payload['messages'] = system_msg + messages
+
+
+                #if self.base_url == "https://openrouter.ai/api/v1/chat/completions":
+                if model == 'openai/o3':
+                    print('!! o3 low thinking')
+                    payload["reasoning"] = {                
+                        "effort": "low", # Can be "high", "medium", or "low" (OpenAI-style)
+                        #"max_tokens": 50, # Specific token limit (Anthropic-style)                
+                        "exclude": True #Set to true to exclude reasoning tokens from response
+                    }
 
                 response = requests.post(
                     self.base_url,

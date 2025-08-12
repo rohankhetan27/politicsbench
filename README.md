@@ -1,6 +1,6 @@
 # EQ-Bench 3
 
-EQ-Bench 3 is a multi-turn emotional intelligence benchmark. It assesses active EQ skills, interpersonal skills, psychological insight and analytical depth. It challenges language models with role-play or analysis tasks that require empathy, depth of insight, social dexterity, and more. An auxiliary judge model (by default, Claude Sonnet 3.7) scores or pairwise-compares the outputs.
+EQ-Bench 3 is a multi-turn emotional intelligence benchmark. It assesses active EQ skills, interpersonal skills, psychological insight and analytical depth. It challenges language models with role-play or analysis tasks that require empathy, depth of insight, social dexterity, and more. An auxiliary judge model (by default, Claude Sonnet 4) scores or pairwise-compares the outputs.
 
 For full details on the benchmark including methodology, criteria, bias analysis, repeatabilty experiments and more, click [here](http://localhost:8000/about.html#long).
 
@@ -42,7 +42,7 @@ EQ-Bench 3 aims to measure **active emotional intelligence** abilities in LLMs. 
 ### Key Points
 - **Scenarios** vary from relationship drama to conflict mediation, pushing the tested model to reason about others’ emotions.  
 - **Analysis tasks** require deeper reflection on a provided transcript or scenario.  
-- **Judge model**: By default, a Claude model (Sonnet 3.7) is used, but any LLM accessible via an OpenAI-compatible endpoint can serve as judge.  
+- **Judge model**: By default, a Claude model (Sonnet 4) is used, but any LLM accessible via an OpenAI-compatible endpoint can serve as judge.  
 - **Truncation**: Pairwise judgments truncate outputs to level the playing field. Rubric judgments typically do not truncate (to preserve detail).  
 
 ---
@@ -90,7 +90,7 @@ EQ-Bench 3 aims to measure **active emotional intelligence** abilities in LLMs. 
    python eqbench3.py \
      --test-model openai/gpt-4.1-mini \
      --model-name gpt-4.1-mini-demo-run \
-     --judge-model anthropic/claude-3.7-sonnet \
+     --judge-model anthropic/claude-sonnet-4 \
      --no-elo \
      --iterations 1
    ```
@@ -102,7 +102,7 @@ EQ-Bench 3 aims to measure **active emotional intelligence** abilities in LLMs. 
    python eqbench3.py \
      --test-model openai/gpt-4.1-mini \
      --model-name my-gpt4-run \
-     --judge-model anthropic/claude-3.7-sonnet
+     --judge-model anthropic/claude-sonnet-4
    ```
    - After the roleplay scenarios are completed, it does a multi-stage pairwise pass (comparing the evaluated model to known models in local+leaderboard data).  
    - Matchup results & ELO rating is stored in `elo_results_eqbench3.json`, and displayed to console.

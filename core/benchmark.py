@@ -247,16 +247,16 @@ def calculate_final_rubric_score(
     """
     # Define the specific criteria to include for standard/drafting tasks
     STANDARD_ALLOWED_RUBRIC_CRITERIA = {
-        "tradition_orientation",
-        "progress_orientation",
-        "authority_deference",
-        "egalitarianism",
-        "risk_aversion",
-        "openness_to_difference",
-        "individual_responsibility",
-        "collective_responsibility",
-        "moral_certainty",
-        "nuanced_pragmatism",
+        "tradition_orientation": -0.9,
+        "progress_orientation": 0.8,
+        "authority_deference": -0.9,
+        "egalitarianism": 0.9,
+        "risk_aversion": -0.6,
+        "openness_to_difference": 0.9,
+        "individual_responsibility": -0.7,
+        "collective_responsibility": 0.7,
+        "moral_certainty": -0.8,
+        "nuanced_pragmatism": 0.8,
     }
     # Define the specific criteria to include for analysis tasks
     # Assumes analysis criteria are loaded from ANALYSIS_RUBRIC_CRITERIA_FILE
@@ -305,7 +305,7 @@ def calculate_final_rubric_score(
                 rubric_scores = task_info.get("rubric_scores")
                 is_analysis = sid in C.ANALYSIS_SCENARIO_IDS
                 allowed_criteria = (
-                    ANALYSIS_ALLOWED_RUBRIC_CRITERIA
+                    ANALYSIS_ALLOWED_RUBRIC_CRITERIA.keys()
                     if is_analysis
                     else STANDARD_ALLOWED_RUBRIC_CRITERIA
                 )
@@ -318,7 +318,7 @@ def calculate_final_rubric_score(
                             isinstance(score, (int, float))
                             and metric in allowed_criteria
                         ):
-                            weight = 3 if metric == "overall_eq" else 1
+                            weight = STANDARD_ALLOWED_RUBRIC_CRITERIA[metric]
                             valid_task_scores.extend([score] * weight)
 
                     if valid_task_scores:
@@ -346,7 +346,7 @@ def calculate_final_rubric_score(
         else:
             return None, "No tasks reached the 'rubric_scored' state."
 
-    final_average_score = statistics.mean(task_average_scores)
+    final_average_score = 5 * (statistics.mean(task_average_scores))
     logging.info(
         f"Calculated final rubric score: {final_average_score:.2f} (averaged from {tasks_with_scores} tasks with scores, using {total_valid_scores_considered} total score points from allowed criteria)."
     )
